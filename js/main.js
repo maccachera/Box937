@@ -3,6 +3,14 @@
    Edite apenas o bloco CONFIG abaixo para publicar os dados reais.
    ===================================================================== */
 
+/* Imagens demonstrativas geradas especialmente para este layout.
+   Os dados são inseridos no HTML final durante a consolidação. */
+const IMAGENS = {
+  hero: "__IMG_HERO__",
+  polimento: "__IMG_POLIMENTO__",
+  finalizado: "__IMG_FINALIZADO__"
+};
+
 const CONFIG = {
   // Somente números, com código do país e DDD. Ex.: "5511987654321"
   whatsapp: "5500000000000",
@@ -15,17 +23,15 @@ const CONFIG = {
   // Endereço usado no mapa e na rota (pode ser o mesmo texto acima)
   enderecoMapa: "[ENDEREÇO COMPLETO], [CIDADE]",
 
-  // Galeria antes/depois. Adicione as fotos em assets/img/ e preencha
-  // "antes" e "depois" com o caminho do arquivo para substituir os
-  // espaços reservados. categoria: lanternagem | pintura | polimento |
-  // estetica | lavagem
+  // Galeria demonstrativa. As comparações usam imagens fictícias para
+  // apresentar a interação até que existam registros reais dos serviços.
   galeria: [
-    { titulo: "Correção de amassado na lateral", categoria: "lanternagem", antes: "", depois: "" },
-    { titulo: "Retoque de pintura no capô", categoria: "pintura", antes: "", depois: "" },
-    { titulo: "Polimento e recuperação do brilho", categoria: "polimento", antes: "", depois: "" },
-    { titulo: "Higienização interna completa", categoria: "estetica", antes: "", depois: "" },
-    { titulo: "Recuperação de para-choque", categoria: "lanternagem", antes: "", depois: "" },
-    { titulo: "Lavagem completa externa e interna", categoria: "lavagem", antes: "", depois: "" }
+    { titulo: "Correção de amassado na lateral", categoria: "lanternagem", antes: IMAGENS.hero, depois: IMAGENS.hero },
+    { titulo: "Retoque de pintura no capô", categoria: "pintura", antes: IMAGENS.polimento, depois: IMAGENS.polimento },
+    { titulo: "Polimento e recuperação do brilho", categoria: "polimento", antes: IMAGENS.polimento, depois: IMAGENS.polimento },
+    { titulo: "Higienização interna completa", categoria: "estetica", antes: IMAGENS.finalizado, depois: IMAGENS.finalizado },
+    { titulo: "Recuperação de para-choque", categoria: "lanternagem", antes: IMAGENS.hero, depois: IMAGENS.hero },
+    { titulo: "Lavagem completa externa e interna", categoria: "lavagem", antes: IMAGENS.finalizado, depois: IMAGENS.finalizado }
   ]
 };
 
@@ -84,6 +90,37 @@ function aplicarConfig() {
 
   const ano = document.getElementById("ano");
   if (ano) ano.textContent = new Date().getFullYear();
+}
+
+/* ---------- Imagens demonstrativas embutidas ---------- */
+function aplicarImagens() {
+  document.querySelectorAll("[data-demo-img]").forEach((el) => {
+    const src = IMAGENS[el.dataset.demoImg];
+    if (!src) return;
+    if (el instanceof HTMLImageElement) el.src = src;
+    else el.style.backgroundImage = `url("${src}")`;
+  });
+}
+
+/* ---------- Política de privacidade ---------- */
+function iniciarPolitica() {
+  const modal = document.getElementById("politica");
+  if (!(modal instanceof HTMLDialogElement)) return;
+
+  document.querySelectorAll("[data-open-privacy]").forEach((botao) => {
+    botao.addEventListener("click", (e) => {
+      e.preventDefault();
+      modal.showModal();
+    });
+  });
+
+  modal.querySelectorAll("[data-close-privacy]").forEach((botao) => {
+    botao.addEventListener("click", () => modal.close());
+  });
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.close();
+  });
 }
 
 /* ---------- Cabeçalho e menu ---------- */
@@ -282,11 +319,13 @@ function iniciarFormulario() {
 
 /* ---------- Inicialização ---------- */
 document.addEventListener("DOMContentLoaded", () => {
+  aplicarImagens();
   aplicarConfig();
   iniciarCabecalho();
   iniciarNavAtiva();
   iniciarGaleria();
   iniciarFormulario();
+  iniciarPolitica();
   aplicarLinksWhatsApp();
   iniciarReveal();
 });
